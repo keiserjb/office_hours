@@ -36,6 +36,20 @@ function office_hours_field_info() {
   );
 }
 
+/**
+ * Implements hook_field_create_field().
+ * 
+ * Ensures that office_hours fields are always created with unlimited cardinality.
+ */
+function office_hours_field_create_field($field) {
+  if ($field['type'] == 'office_hours') {
+    // Force cardinality to unlimited for office_hours fields
+    $field['cardinality'] = FIELD_CARDINALITY_UNLIMITED;
+    // Update the field with the correct cardinality
+    field_update_field($field);
+  }
+}
+
 function office_hours_property_info_callback(&$info, $entity_type, $field, $instance, $field_type) {
   $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$field['field_name']];
 
@@ -80,23 +94,16 @@ function office_hours_property_info_callback(&$info, $entity_type, $field, $inst
  */
 function office_hours_form_field_ui_field_edit_form_alter(&$form, &$form_state, $form_id) {
   if ($form['#field']['type'] == 'office_hours') {
-    // Hide the entire cardinality container and force it to unlimited
+    // Hide the cardinality container visually but keep it in the form
     $form['field']['cardinality_container']['#access'] = FALSE;
-    $form['field']['cardinality_container']['cardinality']['#default_value'] = FIELD_CARDINALITY_UNLIMITED;
+    
+    // Set the cardinality to unlimited using #value so it gets submitted
+    $form['field']['cardinality_container']['cardinality']['#type'] = 'value';
     $form['field']['cardinality_container']['cardinality']['#value'] = FIELD_CARDINALITY_UNLIMITED;
     
-    // Add a submit handler to ensure cardinality is always saved as unlimited
-    $form['#submit'][] = 'office_hours_field_edit_form_submit';
-  }
-}
-
-/**
- * Submit handler to force cardinality to unlimited for office_hours fields.
- */
-function office_hours_field_edit_form_submit($form, &$form_state) {
-  if ($form['#field']['type'] == 'office_hours') {
-    // Force cardinality to unlimited regardless of what was submitted
-    $form_state['values']['field']['cardinality'] = FIELD_CARDINALITY_UNLIMITED;
+    // Also set cardinality_number as a value field (not used but prevents errors)
+    $form['field']['cardinality_container']['cardinality_number']['#type'] = 'value';
+    $form['field']['cardinality_container']['cardinality_number']['#value'] = 1;
   }
 }
 

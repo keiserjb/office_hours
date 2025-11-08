@@ -471,7 +471,7 @@ function _office_hours_field_formatter_defaults($settings = array()) {
         'closed_text' => 'Currently closed',
       ),
       'timezone_field' => '',
-      'date_first_day' => variable_get('date_first_day', 0),
+      'date_first_day' => config_get('system.date', 'first_day'),
     );
 
   // Conversion from (old) checkbox to (new) selectlist.
