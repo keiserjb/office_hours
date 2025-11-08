@@ -57,20 +57,20 @@ class office_hours_handler_filter_open extends views_handler_filter_in_operator 
 //  }
 
   /*
-   function operators() {
-   $operators = parent::operators();
+    function operators() {
+      $operators = parent::operators();
 
-   // Allow swithcing between boolean_operator and in_operator
-   if (isset($operators['in'])) {
-   $operators['in']['title'] = t('Is open on one of the following days');
-   $operators['in']['short'] = t('open');
-   $operators['not in']['title'] = t('Is closed on one of the following days');
-   $operators['not in']['short'] = t('closed');
-   }
+      // Allow swithcing between boolean_operator and in_operator
+      if (isset($operators['in'])) {
+        $operators['in']['title'] = t('Is open on one of the following days');
+        $operators['in']['short'] = t('open');
+        $operators['not in']['title'] = t('Is closed on one of the following days');
+        $operators['not in']['short'] = t('closed');
+      }
 
-   return $operators;
-   }
-   */
+      return $operators;
+    }
+  */
 
   function query() {
     // This empty query is needed to avoid the code from parent.
@@ -83,13 +83,13 @@ class office_hours_handler_filter_open extends views_handler_filter_in_operator 
     // A filter in query() might be quicker, but this is easier to write.
     if (!empty($values)) {
 
-      $operators = $this->value; // in_operator = multivalue.
+      $operators = $this->value;  // in_operator = multivalue.
       if ($operators == array() || $operators == 'All' || $operators == 'all') {
         return;
       }
 
       // Copied from office_hours.module.
-      $today = (int) idate('w', $_SERVER['REQUEST_TIME']); // Get daynumber sun=0 - sat=6.
+      $today = (int)idate('w', $_SERVER['REQUEST_TIME']); // Get daynumber sun=0 - sat=6.
       $now = date('Gi', $_SERVER['REQUEST_TIME']); // 'Gi' format.
 
       foreach ($values as $key => &$object) {

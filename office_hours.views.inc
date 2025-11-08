@@ -7,7 +7,7 @@
  */
 
 /**
- * Implements hook_field_views_data_alter().().
+ * Implements hook_field_views_data_alter().
  */
 function office_hours_field_views_data_alter(&$result, $field, $module) {
   if ($module == 'office_hours') {

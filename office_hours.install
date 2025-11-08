@@ -5,7 +5,7 @@
  */
 
 /**
- * Implements hook_field_schema().().
+ * Implements hook_field_schema().
  */
 function office_hours_field_schema($field) {
   switch ($field['type']) {
@@ -34,11 +34,49 @@ function office_hours_field_schema($field) {
   return array('columns' => $db_columns);
 }
 
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function office_hours_update_7100() { }
+/**
+ * Change value of 'day' column from 0-13 range to normal 0-6 day range.
+ *
+ * This allows for more then 2 hours blocks per day.
+ */
+function office_hours_update_7100() {
+  // Avoid problems when updating from 1.0 / 1.1 to 1.6.
+  // Do the db_add_field('comment') first.
+  office_hours_update_7102();
 
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function office_hours_update_7102() { }
+  // Now do the update to 1.2
+  _office_hours_update_7100_daynum();
+}
+
+/**
+ * Add a Comment column.
+ */
+function office_hours_update_7102() {
+  $db_columns = array(
+    'comment' => array(
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => FALSE,
+    ),
+  );
+
+  $fields = field_info_fields();
+  foreach ($fields as $field_name => $field) {
+    if ($field['type'] == 'office_hours') {
+      $schema = array('columns' => $db_columns,);
+      foreach ($field['storage']['details']['sql'] as $type => $table_info) {
+        foreach ($table_info as $table_name => $columns) {
+          $column_name = _field_sql_storage_columnname($field_name, 'comment');
+          if (!db_field_exists($table_name, $column_name)) {
+            db_add_field($table_name, $column_name, $schema['columns']['comment']);
+          }
+        }
+      }
+    }
+  }
+  field_cache_clear();
+
+}
 
 /**
  * Helper function for hook_update_N.
@@ -96,7 +134,7 @@ function _office_hours_update_7100_daynum() {
 
     // We may run in time problems. Allow restart using a variable.
     $id = -1;
-    $latest_id = config_get('office_hours.settings', 'office_hours-' . $entity_type . '-' . $bundle . '-' . $field_id);
+    $latest_id = variable_get('office_hours-' . $entity_type . '-' . $bundle . '-' . $field_id, $id);
 
     // Convert the 'day' column to from 0-13 to 0-6 day range.
     foreach ($entities as $id => $entity) {
@@ -122,7 +160,7 @@ function _office_hours_update_7100_daynum() {
           foreach ($entity_field as $langcode => &$items) {
             foreach ($items as $index => &$item) {
               $empty = FALSE;
-              $item['day'] = (int) ($item['day'] / 2);
+              $item['day'] = (int)($item['day'] / 2);
             }
           }
         }
@@ -133,7 +171,7 @@ function _office_hours_update_7100_daynum() {
 
           // field_attach_presave($entity_type, $full_entity);  // This unnecessarily shifts the days.
           field_attach_update($entity_type, $full_entity);
-          config_set('office_hours.settings', 'office_hours-' . $entity_type . '-' . $bundle . '-' . $field_id, $id);
+          variable_set('office_hours-' . $entity_type . '-' . $bundle . '-' . $field_id, $id);
         }
       }
     }
@@ -145,32 +183,27 @@ function _office_hours_update_7100_daynum() {
     $bundle = $field['bundle'];
     $field_id = $field['field_id'];
     $field_name = $field['field_name'];
-    config_clear('office_hours.settings', 'office_hours-' . $entity_type . '-' . $bundle . '-' . $field_id);
+    variable_del('office_hours-' . $entity_type . '-' . $bundle . '-' . $field_id);
   }
 }
 
 /**
- * Implements hook_update_last_removed().
- */
-function office_hours_update_last_removed() {
-  return 7102;
-}
-
-/**
- * Migrate office_hours variables to config.
+ * Fix cardinality for office_hours fields to be unlimited.
  */
 function office_hours_update_1000() {
-  $config = config('office_hours.settings');
-  $config->set('office_hoursentity_typebundlefield_id', update_variable_get('office_hoursentity_typebundlefield_id', 'dynamic variable in file /office_hours/office_hours.install line 137'));
-  $config->save();
-
-  update_variable_del('office_hoursentity_typebundlefield_id');
-}
-
-/**
- * Implements hook_install().
- */
-function office_hours_install() {
-  // Dynamically generated variable data was detected.
-  // /office_hours/office_hours.install line 137
+  $fields = field_info_fields();
+  $updated = 0;
+  
+  foreach ($fields as $field_name => $field) {
+    if ($field['type'] == 'office_hours' && $field['cardinality'] != FIELD_CARDINALITY_UNLIMITED) {
+      $field['cardinality'] = FIELD_CARDINALITY_UNLIMITED;
+      field_update_field($field);
+      $updated++;
+    }
+  }
+  
+  if ($updated > 0) {
+    return t('Updated @count office_hours field(s) to have unlimited cardinality.', array('@count' => $updated));
+  }
+  return t('No office_hours fields needed updating.');
 }

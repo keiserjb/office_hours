@@ -6,7 +6,7 @@
  */
 
 /**
- * Implements hook_field_formatter_info().().
+ * Implements hook_field_formatter_info().
  */
 function office_hours_field_formatter_info() {
   return array(
@@ -19,30 +19,30 @@ function office_hours_field_formatter_info() {
 }
 
 /**
- * Implements hook_field_formatter_settings_form().().
+ * Implements hook_field_formatter_settings_form().
  */
 function office_hours_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
   $display = $instance['display'][$view_mode];
   $settings = _office_hours_field_formatter_defaults($instance['display'][$view_mode]['settings']);
   $form = array();
-  /*
-   // Find timezone fields, to be used in 'Current status'-option.
-   $fields = field_info_instances( (isset($form['#entity_type']) ? $form['#entity_type'] : NULL), (isset($form['#bundle']) ? $form['#bundle'] : NULL));
-   $timezone_fields = array();
-   foreach ($fields as $field_name => $timezone_instance) {
-   if ($field_name == $field['field_name']) {
-   continue;
-   }
-   $timezone_field = field_read_field($field_name);
+/*
+  // Find timezone fields, to be used in 'Current status'-option.
+  $fields = field_info_instances( (isset($form['#entity_type']) ? $form['#entity_type'] : NULL), (isset($form['#bundle']) ? $form['#bundle'] : NULL));
+  $timezone_fields = array();
+  foreach ($fields as $field_name => $timezone_instance) {
+    if ($field_name == $field['field_name']) {
+      continue;
+    }
+    $timezone_field = field_read_field($field_name);
 
-   if (in_array($timezone_field['type'], array('tzfield'))) {
-   $timezone_fields[$timezone_instance['field_name']] = $timezone_instance['label'] . ' (' . $timezone_instance['field_name'] . ')';
-   }
-   }
-   if ($timezone_fields) {
-   $timezone_fields = array('' => '<None>') + $timezone_fields;
-   }
-   */
+    if (in_array($timezone_field['type'], array('tzfield'))) {
+      $timezone_fields[$timezone_instance['field_name']] = $timezone_instance['label'] . ' (' . $timezone_instance['field_name'] . ')';
+    }
+  }
+  if ($timezone_fields) {
+    $timezone_fields = array('' => '<None>') + $timezone_fields;
+  }
+ */
 
   // @TODO: The settings could go under the several 'core' settings,
   // as above in the implemented hook_FORMID_form_alter functions.
@@ -54,15 +54,15 @@ function office_hours_field_formatter_settings_form($field, $instance, $view_mod
     '#weight' => 5,
   );
 
-  /*  // dec-2012: converted from checkbox to selectlist.
-   $form['showclosed'] = array(
-   '#type' => 'checkbox',
-   '#title' => t('Show empty days'),
-   '#required' => FALSE,
-   '#default_value' => $settings['showclosed'],
-   '#description' => t('Show empty days on the field.'),
-   );
-   */
+/*  // dec-2012: converted from checkbox to selectlist.
+  $form['showclosed'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show empty days'),
+    '#required' => FALSE,
+    '#default_value' => $settings['showclosed'],
+    '#description' => t('Show empty days on the field.'),
+  );
+ */
   $form['showclosed'] = array(
     '#type' => 'select',
     '#title' => t('Number of days to show'),
@@ -194,29 +194,29 @@ function office_hours_field_formatter_settings_form($field, $instance, $view_mod
     '#description' => t('Format of message displayed when currently closed. You can use translatable text and HTML in this field.'),
   );
 
-  /*
-   if ($timezone_fields) {
-   $form['timezone_field'] = array(
-   '#type' => 'select',
-   '#title' => t('Timezone') . ' ' . t('Field'),
-   '#options' => $timezone_fields,
-   '#default_value' => $settings['timezone_field'],
-   '#description' => t('Should we use another field to set the timezone for these hours?'),
-   );
-   }
-   else {
-   $form['timezone_field'] = array(
-   '#type' => 'hidden',
-   '#value' => $settings['timezone_field'],
-   );
-   }
-   */
+/*
+  if ($timezone_fields) {
+    $form['timezone_field'] = array(
+      '#type' => 'select',
+      '#title' => t('Timezone') . ' ' . t('Field'),
+      '#options' => $timezone_fields,
+      '#default_value' => $settings['timezone_field'],
+      '#description' => t('Should we use another field to set the timezone for these hours?'),
+    );
+  }
+  else {
+    $form['timezone_field'] = array(
+      '#type' => 'hidden',
+      '#value' => $settings['timezone_field'],
+    );
+  }
+ */
 
   return $form;
 }
 
 /**
- * Implements hook_field_formatter_settings_summary().().
+ * Implements hook_field_formatter_settings_summary().
  *
  * Returns a short summary for the current formatter settings of an instance.
  * @TODO: return more info, like the Date module does.
@@ -233,7 +233,7 @@ function office_hours_field_formatter_settings_summary($field, $instance, $view_
 }
 
 /**
- * Implements hook_field_formatter_view().().
+ * Implements hook_field_formatter_view().
  *
  * Be careful: date_api uses PHP: 0=Sunday, and DateObject uses ISO: 1=Sunday.
  */
@@ -253,7 +253,7 @@ function office_hours_field_formatter_view($entity_type, $entity, $field, $insta
     'langcode' => $langcode,
     'display' => $display,
   );
-  backdrop_alter('office_hours_field_formatter_view', $items, $context);
+  drupal_alter('office_hours_field_formatter_view', $items, $context);
 
   // Initialize formatter settings.
   $settings = _office_hours_field_formatter_defaults($display['settings']);
@@ -284,15 +284,15 @@ function office_hours_field_formatter_view($entity_type, $entity, $field, $insta
   $days = array();
   for ($day = 0; $day < 7; $day++) {
     $days[$day] = array(
-      'startday' => $day,
-      'endday' => NULL,
-      'times' => NULL,
-      'current' => FALSE,
-      'next' => FALSE,
+      'startday'    => $day,
+      'endday'      => NULL,
+      'times'       => NULL,
+      'current'     => FALSE,
+      'next'        => FALSE,
     );
   }
 
-  // @TODO: support timezones.
+ // @TODO: support timezones.
   $timezone = NULL;
 
   // Avoid repetitive calculations, use static.
@@ -343,8 +343,8 @@ function office_hours_field_formatter_view($entity_type, $entity, $field, $insta
       if ($start <= $now) {
         // We were open today, check if we are still open.
         if (($start > $end)    // We are open until after midnight.
-             || ($start == $end) // We are open 24hrs per day.
-             || (($start < $end) && ($end > $now))) { // We have closed already.
+            || ($start == $end) // We are open 24hrs per day.
+            || (($start < $end) && ($end > $now))) { // We have closed already.
           $days[$day]['current'] = TRUE;
           $next = (int) $day;
         }
@@ -420,29 +420,29 @@ function office_hours_field_formatter_view($entity_type, $entity, $field, $insta
   // Theme the result.
   $element[] = array(
     '#markup' => theme(
-      'office_hours_field_formatter_default', 
+      'office_hours_field_formatter_default',
       array(
-      'element' => $items,
-      'display' => $display,
-      'days' => $days,
-      'days2calc' => $days2calc,
-      'settings' => $settings,
-      'daynames' => $daynames,
-      'timezone' => $timezone,
-      'context' => array(
-        'entity_type' => $entity_type,
-        'entity' => $entity,
-        'field' => $field,
-        'instance' => $instance,
-        'langcode' => $langcode,
-        'items' => $items,
-        'display' => $display,
-      ),
-    )
+        'element'  => $items,
+        'display'  => $display,
+        'days'     => $days,
+        'days2calc'=> $days2calc,
+        'settings' => $settings,
+        'daynames' => $daynames,
+        'timezone' => $timezone,
+        'context' => array(
+          'entity_type' => $entity_type,
+          'entity' => $entity,
+          'field' => $field,
+          'instance' => $instance,
+          'langcode' => $langcode,
+          'items' => $items,
+          'display' => $display,
+        ),
+      )
     ),
     '#attached' => array(
       'js' => array(
-        backdrop_get_path('module', 'office_hours') . '/js/office_hours.formatter.js',
+        backdrop_get_path('module', 'office_hours') . '/js/office_hours.formatter.js' => array(),
       ),
     ),
   );
@@ -450,34 +450,29 @@ function office_hours_field_formatter_view($entity_type, $entity, $field, $insta
   return $element;
 }
 
-/**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
- */
 function _office_hours_field_formatter_defaults($settings = array()) {
   // Assure all values are set. Append with missing values.
-  // TODO This variable was probably removed in Backdrop without replacement.
   $settings +=
     array(
-    'daysformat' => 'long',
-    'hoursformat' => 0, // '12'/'24'/'HH:mm',
-    'compress' => FALSE,
-    'grouped' => FALSE,
-    'showclosed' => 'all',
-    'closedformat' => 'Closed', // The html-string for closed/empty days.
-    'separator_days' => '<br />',
-    'separator_grouped_days' => ' - ',
-    'separator_day_hours' => ': ',
-    'separator_hours_hours' => '-',
-    'separator_more_hours' => ', ',
-    'current_status' => array(
-      'position' => 'hide',
-      'open_text' => 'Currently open!',
-      'closed_text' => 'Currently closed',
-    ),
-    'timezone_field' => '',
-    'date_first_day' => variable_get('date_first_day', 0),
-  );
+      'daysformat' => 'long',
+      'hoursformat' => 0, // '12'/'24'/'HH:mm',
+      'compress' => FALSE,
+      'grouped' => FALSE,
+      'showclosed' => 'all',
+      'closedformat' => 'Closed',   // The html-string for closed/empty days.
+      'separator_days' => '<br />',
+      'separator_grouped_days' => ' - ',
+      'separator_day_hours' => ': ',
+      'separator_hours_hours' => '-',
+      'separator_more_hours' => ', ',
+      'current_status' => array(
+        'position' => 'hide',
+        'open_text' => 'Currently open!',
+        'closed_text' => 'Currently closed',
+      ),
+      'timezone_field' => '',
+      'date_first_day' => variable_get('date_first_day', 0),
+    );
 
   // Conversion from (old) checkbox to (new) selectlist.
   $settings['showclosed'] = ($settings['showclosed'] == '1') ? 'all' : $settings['showclosed'];

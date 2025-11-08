@@ -4,7 +4,7 @@
    * Determine the open/closed status dynamically, to avoid errors due to caching.
    * @todo: this should also be done for the 'Next' value,
    */
-  Backdrop.behaviors.office_hours = {
+  Drupal.behaviors.office_hours = {
     attach: function (context, settings) {
       if ($('.oh-current-wrapper', context).length == 0) {
         return;
@@ -13,7 +13,7 @@
       // Only run if output is enabled (wrapper exists in DOM)
       $('.oh-current-wrapper', context).each(function () {
         var current_context_id = $(this).data('oh-current-context_id');
-        var slots = Backdrop.settings.office_hours.instances[current_context_id];
+        var slots = Drupal.settings.office_hours.instances[current_context_id];
         if (!slots) {
           return;
         }

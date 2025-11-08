@@ -6,7 +6,7 @@
  */
 
 /**
- * Implements hook_field_info().().
+ * Implements hook_field_info().
  */
 function office_hours_field_info() {
   return array(
@@ -28,6 +28,7 @@ function office_hours_field_info() {
       ),
       'default_widget' => 'office_hours',
       'default_formatter' => 'office_hours',
+
       // Integrate with the Entity Metadata module.
       'property_type' => 'office_hours',
       'property_callbacks' => array('office_hours_property_info_callback'),
@@ -35,10 +36,6 @@ function office_hours_field_info() {
   );
 }
 
-/**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
- */
 function office_hours_property_info_callback(&$info, $entity_type, $field, $instance, $field_type) {
   $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$field['field_name']];
 
@@ -77,28 +74,48 @@ function office_hours_property_info_callback(&$info, $entity_type, $field, $inst
 }
 
 /**
- * Implements hook_form_FORM_ID_alter().().
+ * Implements hook_form_FORM_ID_alter().
  *
- * Changes the hook_field_settings_form.
+ * Hides the cardinality field for office_hours fields since it must be unlimited.
  */
 function office_hours_form_field_ui_field_edit_form_alter(&$form, &$form_state, $form_id) {
   if ($form['#field']['type'] == 'office_hours') {
-    $description = t("This is unlimited by this field's nature. See below for limiting the number of blocks per day.");
-    $form['field']['cardinality'] = array(
-      '#type' => 'select',
-      '#title' => t('Number of values'),
-      // '#options' => backdrop_map_assoc(array(14)) + array(FIELD_CARDINALITY_UNLIMITED => t('unlimited')) + backdrop_map_assoc(range(1, 10)),
-      // '#options' => backdrop_map_assoc(array(14)),
-      // '#default_value' => 14,
-      '#options' => array(FIELD_CARDINALITY_UNLIMITED => t('unlimited')),
-      '#default_value' => FIELD_CARDINALITY_UNLIMITED,
-      '#description' => $description,
-    );
+    // Hide the entire cardinality container and force it to unlimited
+    $form['field']['cardinality_container']['#access'] = FALSE;
+    $form['field']['cardinality_container']['cardinality']['#default_value'] = FIELD_CARDINALITY_UNLIMITED;
+    $form['field']['cardinality_container']['cardinality']['#value'] = FIELD_CARDINALITY_UNLIMITED;
+    
+    // Add a submit handler to ensure cardinality is always saved as unlimited
+    $form['#submit'][] = 'office_hours_field_edit_form_submit';
   }
 }
 
 /**
- * Implements hook_field_settings_form().().
+ * Submit handler to force cardinality to unlimited for office_hours fields.
+ */
+function office_hours_field_edit_form_submit($form, &$form_state) {
+  if ($form['#field']['type'] == 'office_hours') {
+    // Force cardinality to unlimited regardless of what was submitted
+    $form_state['values']['field']['cardinality'] = FIELD_CARDINALITY_UNLIMITED;
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Hides the instance-level cardinality display for office_hours fields.
+ */
+function office_hours_form_field_ui_field_settings_form_alter(&$form, &$form_state, $form_id) {
+  if (isset($form['field']['#field']['type']) && $form['field']['#field']['type'] == 'office_hours') {
+    // Hide the second "Number of values" display at the bottom
+    if (isset($form['instance']['cardinality'])) {
+      $form['instance']['cardinality']['#access'] = FALSE;
+    }
+  }
+}
+
+/**
+ * Implements hook_field_settings_form().
  *
  * Handle the global parameters for a field.
  */
@@ -122,9 +139,9 @@ function office_hours_field_settings_form($field, $instance, $has_data) {
     '#type' => 'select',
     '#title' => t('Number of blocks'),
     // @todo for 'multiple blocks per day': add support for FIELD_CARDINALITY_UNLIMITED.
-    // '#options' => array(FIELD_CARDINALITY_UNLIMITED => t('Unlimited')) + backdrop_map_assoc(range(1, 10)),
-    // '#options' => backdrop_map_assoc(range(1, 2)),
-    '#options' => backdrop_map_assoc(range(1, 12)),
+    // '#options' => array(FIELD_CARDINALITY_UNLIMITED => t('Unlimited')) + drupal_map_assoc(range(1, 10)),
+    // '#options' => drupal_map_assoc(range(1, 2)),
+    '#options' => drupal_map_assoc(range(1, 12)),
     '#default_value' => $settings['cardinality'],
     '#description' => $description,
     // '#disabled' => $has_data,
@@ -211,28 +228,28 @@ function office_hours_field_settings_form($field, $instance, $has_data) {
     '#options' => $hours,
   );
 
-  /*
-   // @Todo: activate this, to Show $form['limitstart'] and $form['limitend'] using the normal widget.
-   $form_state = NULL;
-   $default_value_field = $field;
-   $default_value_field['settings']['granularity'] = '60';
-   $langcode = 'und';
-   $items = array();
-   $delta = 0;
-   $element = NULL;
+/*
+  // @Todo: activate this, to Show $form['limitstart'] and $form['limitend'] using the normal widget.
+  $form_state = NULL;
+  $default_value_field = $field;
+  $default_value_field['settings']['granularity'] = '60';
+  $langcode = 'und';
+  $items = array();
+  $delta = 0;
+  $element = NULL;
 
-   $elements = office_hours_field_widget_form($form, $form_state, $default_value_field, $instance, $langcode, $items, $delta, $element);
+  $elements = office_hours_field_widget_form($form, $form_state, $default_value_field, $instance, $langcode, $items, $delta, $element);
 
-   $form['limits'] = $elements[0];
-   $form['limits']['#dayname'] = 'Limit widget hours';
-   $form['limits']['#description'] = t('Restrict the hours available - select options will be between these hours.');
-   $form['limits']['#default_value'] = array(
-   'day' => 0,
-   'daydelta' => 0,
-   'starthours' => $settings['limitstart'],
-   'endhours' => $settings['limitend'],
-   );
-   */
+  $form['limits'] = $elements[0];
+  $form['limits']['#dayname'] = 'Limit widget hours';
+  $form['limits']['#description'] = t('Restrict the hours available - select options will be between these hours.');
+  $form['limits']['#default_value'] = array(
+    'day' => 0,
+    'daydelta' => 0,
+    'starthours' => $settings['limitstart'],
+    'endhours' => $settings['limitend'],
+  );
+*/
 
   return $form;
 }
@@ -250,7 +267,7 @@ function _office_hours_field_settings_form_validate($element, &$form_state) {
 }
 
 /**
- * Implements hook_field_is_empty().().
+ * Implements hook_field_is_empty().
  */
 function office_hours_field_is_empty($item, $field) {
   if ($item['starthours'] == '' || $item['endhours'] == '' || !isset($item['day']) || $item['day'] === '') {
@@ -289,7 +306,7 @@ function office_hours_instance_is_empty($items) {
 // }
 
 /**
- * Implements hook_field_validate().().
+ * Implements hook_field_validate().
  * Is called a.o. when saving the content type field (default value) and content.
  */
 function office_hours_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {

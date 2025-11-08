@@ -30,8 +30,8 @@ function hook_office_hours_field_formatter_view_alter($items, $context) {
     switch ($field['field_name']) {
       case 'field_office_hours':
         // The array of holidays that we are closed for.
-        $holidays = backdrop_map_assoc(array('2015-06-20', '2015-12-25', '2015-12-26'));
-
+        $holidays = drupal_map_assoc(array('2015-06-20', '2015-12-25', '2015-12-26'));
+        
         $tz = new DateTimeZone('Australia/Brisbane');
         $this_week = new DateTime('now', $tz);
         $this_week->setISODate($this_week->format('Y'), $this_week->format('W'));

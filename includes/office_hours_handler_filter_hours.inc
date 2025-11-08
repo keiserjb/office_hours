@@ -24,10 +24,10 @@ class office_hours_handler_filter_hours extends views_handler_filter_numeric {
     // TODO: add better selection and representation of hours,
     // using $field['settings'] and using/improving existing routines.
     //$hours = _office_hours_field_widget_hours($field['settings']);
-    //$hours = backdrop_map_assoc($hours); // $key == $value.
+    //$hours = drupal_map_assoc($hours); // $key == $value.
 
     $hours = _office_hours_show_ampm(date_hours('H', FALSE));
-    $hours = backdrop_map_assoc($hours); // $key == $value.
+    $hours = drupal_map_assoc($hours); // $key == $value.
 
     // Make al text fields a select field.
     $hour_select = array(
@@ -62,27 +62,27 @@ class office_hours_handler_filter_hours extends views_handler_filter_numeric {
 //    $this->ensure_my_table();
 //    $this->query->add_where($this->options['group'], "$this->table_alias.$this->real_field", $this->value, $this->operator);
 
-    /*
-     switch ($this->operator) {
-     case '<':
-     case '<=':
-     case '=':
-     case '!=':
-     case '>=':
-     case '>':
-     $this->value['starthours'] = $this->value['value'];
-     $this->query->add_where($this->options['group'], "$this->table_alias.$this->real_field", $this->value, $this->operator);
-     break;
-     case 'between':
-     break;
-     case 'not between':
-     break;
-     case 'empty':
-     case 'not empty':
-     $this->query->add_where($this->options['group'], "$this->table_alias.$this->real_field", $this->value, $this->operator);
-     break;
-     break;
-     }
-     */
+/*
+    switch ($this->operator) {
+      case '<':
+      case '<=':
+      case '=':
+      case '!=':
+      case '>=':
+      case '>':
+        $this->value['starthours'] = $this->value['value'];
+        $this->query->add_where($this->options['group'], "$this->table_alias.$this->real_field", $this->value, $this->operator);
+        break;
+      case 'between':
+        break;
+      case 'not between':
+        break;
+      case 'empty':
+      case 'not empty':
+        $this->query->add_where($this->options['group'], "$this->table_alias.$this->real_field", $this->value, $this->operator);
+        break;
+        break;
+    }
+*/
   }
 }

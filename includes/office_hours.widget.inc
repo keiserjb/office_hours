@@ -7,7 +7,6 @@
 
 /**
  * Implements hook_field_widget_info().
-().
  */
 function office_hours_field_widget_info() {
   return array(
@@ -30,7 +29,6 @@ function office_hours_field_widget_info() {
 
 /**
  * Implements hook_field_widget_form().
-().
  *
  * Generates a set of time_block form-items.
  * N.B. when changing this function, be aware that it is also used in office_hours_field_settings_form().
@@ -47,15 +45,15 @@ function office_hours_field_widget_form(&$form, &$form_state, $field, $instance,
   $daynames = date_week_days(FALSE);
   // Get the valid hours. Date API doesn't provide a straight method for this.
   $hours =  _office_hours_field_widget_hours($settings);
-//  $hours = backdrop_map_assoc($hours); // $key == $value.
+  //  $hours = drupal_map_assoc($hours); // $key == $value.
   // Get the valid minutes, using Date API.
   $minutes = date_minutes('i', FALSE, $granularity);
-  $minutes = backdrop_map_assoc($minutes);
+  $minutes = drupal_map_assoc($minutes);
   // Add the hours/minutes to the field settings, for best performance.
   $settings['#hours'] = $hours;
   $settings['#minutes'] = $minutes;
 
-  switch ($instance['widget']['type']) {
+  switch ($instance ['widget']['type']) {
 
     case 'office_hours':
       // Create full widget with 7 days: an indexed two level array of time blocks.
@@ -70,8 +68,10 @@ function office_hours_field_widget_form(&$form, &$form_state, $field, $instance,
       $elements = array();
       $days = _office_hours_week_days_ordered(range(0, 6), $settings['date_first_day']);
       foreach ($days as $index => $day) {
-        // todo: theme_function clears values above cardinality. move it here.
-        for ($daydelta = 0; $daydelta < max(2, $cardinality); $daydelta++) {
+        // Show at least 2 rows for UI purposes, but respect cardinality for actual storage
+        // If cardinality is 1, only the first row is saved; the second row is hidden.
+        $rows_to_show = max(2, $cardinality);
+        for ($daydelta = 0; $daydelta < $rows_to_show; $daydelta++) {
           $element['#type'] = 'office_hours_block';
           $element['#default_value'] = isset($items[$day][$daydelta]['starthours']) ? $items[$day][$daydelta] : NULL;
           $element['#day'] = $day;
@@ -85,12 +85,12 @@ function office_hours_field_widget_form(&$form, &$form_state, $field, $instance,
 
       // Build multi element widget.
       $widget = array(
-        '#theme' => 'office_hours_week',
-        '#field_name' => $field['field_name'],
-        '#title' => check_plain($instance['label']),
-        '#required' => $instance['required'],
-        '#description' => field_filter_xss($instance['description']),
-      ) + $elements;
+          '#theme' => 'office_hours_week',
+          '#field_name' => $field['field_name'],
+          '#title' => check_plain($instance['label']),
+          '#required' => $instance['required'],
+          '#description' => field_filter_xss($instance['description']),
+        ) + $elements;
 
       break;
 
@@ -109,7 +109,7 @@ function office_hours_field_widget_form(&$form, &$form_state, $field, $instance,
       $widget['starthours'] = array(
         '#type' => 'office_hours_select',
         // Using capitals enables automatic translation. mb_strtolower also converts 'À' to 'à'.
- //        '#prefix' => mb_strtolower( t('From', array('context' => 'office_hours')) ) . ' ',
+//        '#prefix' => mb_strtolower( t('From', array('context' => 'office_hours')) ) . ' ',
         '#default_value' => isset($items[$delta]['starthours']) ? $items[$delta]['starthours'] : NULL,
         '#field_settings' => $settings,
       );
@@ -128,7 +128,6 @@ function office_hours_field_widget_form(&$form, &$form_state, $field, $instance,
 
 /**
  * Implements hook_field_widget_error().
-().
  *
  * This is necessary to show the errors thrown in hook_field_validate().
  */

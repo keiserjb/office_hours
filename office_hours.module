@@ -6,7 +6,7 @@
  */
 
 // @TODO 2012-05-13: it would be nice to include this file in the .info-file, but the OH-block is lost after F5-page refresh.
-// @TODO see http://nodesforbreakfast.com/article/2012/02/20/organize-your-module-code-hookhookinfo-backdrop-7
+// @TODO see http://nodesforbreakfast.com/article/2012/02/20/organize-your-module-code-hookhookinfo-drupal-7
 // @todo for 'multiple blocks per day', see code with string 'multiple blocks per day'.
 module_load_include('inc', 'office_hours', 'includes/office_hours.elements');
 module_load_include('inc', 'office_hours', 'includes/office_hours.field');
@@ -15,29 +15,28 @@ module_load_include('inc', 'office_hours', 'includes/office_hours.widget');
 
 /**
  * Implements hook_theme().
-().
  */
-function office_hours_theme($existing, $type, $theme, $path) {
+function office_hours_theme() {
+  $path = backdrop_get_path('module', 'office_hours');
   $base = array(
     'render element' => 'element',
     'file' => 'includes/office_hours.theme.inc',
-    'path' => "$path",
+    'path' => $path,
   );
   $themes = array(
     // Formatter theming functions.
     'office_hours_field_formatter_default' => $base,
-    'office_hours_time_range' => $base + array(),
+    'office_hours_time_range' => $base,
     // Widget theming functions.
-    'office_hours_week' => $base + array(),
-    'office_hours_block' => $base + array(),
-    'office_hours_select' => $base + array(),
+    'office_hours_week' => $base,
+    'office_hours_block' => $base,
+    'office_hours_select' => $base,
   );
   return $themes;
 }
 
 /**
- * Implements hook_element_info().
-().
+ * Implements FAPI hook_element_info().
  */
 function office_hours_element_info() {
   return array(
@@ -49,14 +48,11 @@ function office_hours_element_info() {
       '#columns' => array('day', 'starthours', 'endhours', 'comment'),
       '#theme' => 'office_hours_block',
       '#attached' => array(
-        'css' => array(
-           backdrop_get_path('module', 'office_hours') . '/css/office_hours.css',
-         ),
         'js' => array(
-          backdrop_get_path('module', 'office_hours') . '/js/office_hours.widget.js',
+          backdrop_get_path('module', 'office_hours') . '/js/office_hours.widget.js' => array(),
         ),
       ),
-       //'#pre_render' => array('_office_hours_pre_render_element'),
+      // '#pre_render' => array('_office_hours_pre_render_element'),
     ),
     'office_hours_select' => array(
       '#input' => TRUE,
@@ -71,12 +67,12 @@ function office_hours_element_info() {
       '#process' => array('_office_hours_comment_process'),
       '#element_validate' => array('_office_hours_comment_validate'),
     ),
+
   );
 }
 
 /**
  * Implements hook_views_api().
-().
  */
 function office_hours_views_api() {
   return array(
@@ -167,10 +163,6 @@ function _office_hours_convert_to_ampm($time, $timeformat = 'g:i a') {
 /*
  * Helper function to convert '08:00' / '8:00' / '800' to '0800'
  */
-/**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
- */
 function _office_hours_time_to_mil($time) {
   if (is_null($time)) {
     return $time;
@@ -184,10 +176,6 @@ function _office_hours_time_to_mil($time) {
 
 /*
  * Helper function to convert '800' or '0800' to '08:00'
- */
-/**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
  */
 function _office_hours_time_to_24hr($time = '') {
   if (strstr($time, ':')) {
@@ -209,10 +197,6 @@ function _office_hours_time_to_24hr($time = '') {
  *   h = 12-hour format of an hour with leading zeros    01 through 12
  *   H = 24-hour format of an hour with leading zeros    00 through 23
  */
-/**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
- */
 function _office_hours_field_widget_time_parse($time, $hoursformat) {
   $hour = '';
   $min = '';
@@ -225,11 +209,7 @@ function _office_hours_field_widget_time_parse($time, $hoursformat) {
     $hour = $hour * 100;
   }
 
-  $result = array(
-    'hour' => $hour,
-    'minute' => $min,
-    'ampm' => $ampm,
-  );
+  $result = array('hour' => $hour, 'minute' => $min, 'ampm' => $ampm);
   return $result;
 }
 
@@ -252,15 +232,4 @@ function _office_hours_week_days_ordered($weekdays, $first_day) {
     }
   }
   return $weekdays;
-}
-
-/**
- * Implements hook_autoload_info().
- */
-function office_hours_autoload_info() {
-  return array(
-    'office_hours_handler_filter_day' => 'includes/office_hours_handler_filter_day.inc',
-    'office_hours_handler_filter_hours' => 'includes/office_hours_handler_filter_hours.inc',
-    'office_hours_handler_filter_open' => 'includes/office_hours_handler_filter_open.inc',
-  );
 }

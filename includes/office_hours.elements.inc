@@ -46,7 +46,7 @@ function _office_hours_block_process($element, &$form_state, $form) {
     }
     $element['#value']['starthours'] = '';
     $element['#value']['endhours'] = '';
-    // The following class is the trigger for js to hide the row.
+    // The following class is the trigger for js to hide the row. 
     $element['#prefix'] .= "<div class='oh-hide'>";
     $element['#suffix'] .= '</div>';
   }
@@ -96,7 +96,7 @@ function _office_hours_block_process($element, &$form_state, $form) {
   );
   $element['comment'] = array(
     '#type' => $has_comment ? 'textfield' : 'hidden',
-    '#prefix' => $has_comment?t('Comment') . ' ' : '',
+    '#prefix' => $has_comment ? t('Comment') . ' ' : '',
     '#default_value' => isset($element['#value']['comment']) ? $element['#value']['comment'] : NULL,
     '#size' => 25,
     '#maxlength' => 255,
@@ -174,15 +174,17 @@ function _office_hours_select_validate($element, &$form_state) {
 
   if ($hours != '' && $minutes != '') {
     form_set_value($element, _office_hours_time_to_mil($hours + $minutes), $form_state);
+    
+    // Only validate if we have actual values
+    if ($hours < 0000 || $hours > 2300) {
+      form_error($element, t('Hours should be between 0 and 23.', array(), array('office_hours')));
+    }
+    if ($minutes < 0 || $minutes > 59) {
+      form_error($element, t('Minutes should be between 0 and 59.', array(), array('office_hours')));
+    }
   }
   else {
     form_set_value($element, '', $form_state);
-  }
-  if ($hours < 0000 || $hours > 2300) {
-    form_error($element, t('Hours should be between 0 and 23.', array(), array('office_hours')));
-  }
-  if ($minutes < 0 || $minutes > 59) {
-    form_error($element, t('Minutes should be between 0 and 59.', array(), array('office_hours')));
   }
 }
 
@@ -194,7 +196,7 @@ function _office_hours_select_validate($element, &$form_state) {
  * which is set in _office_hours_select_validate().
  */
 function _office_hours_block_validate($element, &$form_state) {
-  $item = backdrop_array_get_nested_value($form_state['values'], $element['#parents']);
+  $item = drupal_array_get_nested_value($form_state['values'], $element['#parents']);
 
   $error_text = '';
   $valhrs = $element['#field_settings']['valhrs'];
@@ -202,6 +204,13 @@ function _office_hours_block_validate($element, &$form_state) {
   $limitend = $element['#field_settings']['limitend'];
   $starthours = $item['starthours'];
   $endhours = $item['endhours'];
+  
+  // If both hours are empty, this is an optional block (like secondary "and" blocks).
+  // Skip validation for completely empty blocks.
+  if ($starthours == '' && $endhours == '') {
+    return;
+  }
+  
   // Do not use empty(), since '0' is a valid value, too.
   if ($starthours == '' xor $endhours == '') {
     $error_text = 'Both Opening hours and Closing hours must be set.';
@@ -222,9 +231,9 @@ function _office_hours_block_validate($element, &$form_state) {
       . ': '
       . t($error_text,
         array(
-      '!start' => _office_hours_time_to_24hr($limitstart),
-      '!end' => _office_hours_time_to_24hr($limitend),
-    ),
+          '!start' => _office_hours_time_to_24hr($limitstart),
+          '!end' => _office_hours_time_to_24hr($limitend),
+        ),
         array('context' => 'office_hours')
       );
     form_error($element, check_plain($error_text));
