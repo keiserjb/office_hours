@@ -1,7 +1,5 @@
 # Office Hours
 
-### Status of all the features in the module port are unknown.  It is under active development.
-
 Office Hours creates a Field, that you can add to any entity (like a location,
 a restaurant or a user) to represent "office hours" or "opening hours".
 
