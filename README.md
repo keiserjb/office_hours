@@ -5,6 +5,8 @@
 Office Hours creates a Field, that you can add to any entity (like a location,
 a restaurant or a user) to represent "office hours" or "opening hours".
 
+![Screenshot](images/office-hours-img.png)
+
 ## General Features
 The Backdrop version now provides the following features: 
 - Feeds module support to import data. (See below for details.)
