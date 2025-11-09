@@ -2,6 +2,7 @@
 
 ## Overview
 This document outlines the changes made to port the Office Hours module from Drupal 7 to Backdrop CMS.
+This document is completely AI generated (other than this line) and I have not reviewed this document for accuracy. 
 
 ## Key Changes Made
 
