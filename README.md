@@ -127,8 +127,8 @@ Bugs and feature requests should be reported in the
 
 ## Current Maintainer
 
-[Justin Keiser](https://github.com/keiserjb)
-Tim Erickson ([@stpaultim](https://github.com/stpaultim)).
+- [Justin Keiser](https://github.com/keiserjb) 
+- Tim Erickson ([@stpaultim](https://github.com/stpaultim))
 
 ## Credits
 
