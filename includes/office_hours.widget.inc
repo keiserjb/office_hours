@@ -45,10 +45,10 @@ function office_hours_field_widget_form(&$form, &$form_state, $field, $instance,
   $daynames = date_week_days(FALSE);
   // Get the valid hours. Date API doesn't provide a straight method for this.
   $hours =  _office_hours_field_widget_hours($settings);
-  //  $hours = drupal_map_assoc($hours); // $key == $value.
+  //  $hours = backdrop_map_assoc($hours); // $key == $value.
   // Get the valid minutes, using Date API.
   $minutes = date_minutes('i', FALSE, $granularity);
-  $minutes = drupal_map_assoc($minutes);
+  $minutes = backdrop_map_assoc($minutes);
   // Add the hours/minutes to the field settings, for best performance.
   $settings['#hours'] = $hours;
   $settings['#minutes'] = $minutes;

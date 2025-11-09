@@ -196,7 +196,7 @@ function _office_hours_select_validate($element, &$form_state) {
  * which is set in _office_hours_select_validate().
  */
 function _office_hours_block_validate($element, &$form_state) {
-  $item = drupal_array_get_nested_value($form_state['values'], $element['#parents']);
+  $item = backdrop_array_get_nested_value($form_state['values'], $element['#parents']);
 
   $error_text = '';
   $valhrs = $element['#field_settings']['valhrs'];

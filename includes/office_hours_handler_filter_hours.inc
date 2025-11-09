@@ -24,10 +24,10 @@ class office_hours_handler_filter_hours extends views_handler_filter_numeric {
     // TODO: add better selection and representation of hours,
     // using $field['settings'] and using/improving existing routines.
     //$hours = _office_hours_field_widget_hours($field['settings']);
-    //$hours = drupal_map_assoc($hours); // $key == $value.
+    //$hours = backdrop_map_assoc($hours); // $key == $value.
 
     $hours = _office_hours_show_ampm(date_hours('H', FALSE));
-    $hours = drupal_map_assoc($hours); // $key == $value.
+    $hours = backdrop_map_assoc($hours); // $key == $value.
 
     // Make al text fields a select field.
     $hour_select = array(

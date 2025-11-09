@@ -146,9 +146,9 @@ function office_hours_field_settings_form($field, $instance, $has_data) {
     '#type' => 'select',
     '#title' => t('Number of blocks'),
     // @todo for 'multiple blocks per day': add support for FIELD_CARDINALITY_UNLIMITED.
-    // '#options' => array(FIELD_CARDINALITY_UNLIMITED => t('Unlimited')) + drupal_map_assoc(range(1, 10)),
-    // '#options' => drupal_map_assoc(range(1, 2)),
-    '#options' => drupal_map_assoc(range(1, 12)),
+    // '#options' => array(FIELD_CARDINALITY_UNLIMITED => t('Unlimited')) + backdrop_map_assoc(range(1, 10)),
+    // '#options' => backdrop_map_assoc(range(1, 2)),
+    '#options' => backdrop_map_assoc(range(1, 12)),
     '#default_value' => $settings['cardinality'],
     '#description' => $description,
     // '#disabled' => $has_data,
