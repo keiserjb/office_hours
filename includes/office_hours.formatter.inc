@@ -253,7 +253,7 @@ function office_hours_field_formatter_view($entity_type, $entity, $field, $insta
     'langcode' => $langcode,
     'display' => $display,
   );
-  drupal_alter('office_hours_field_formatter_view', $items, $context);
+  backdrop_alter('office_hours_field_formatter_view', $items, $context);
 
   // Initialize formatter settings.
   $settings = _office_hours_field_formatter_defaults($display['settings']);
@@ -296,7 +296,7 @@ function office_hours_field_formatter_view($entity_type, $entity, $field, $insta
   $timezone = NULL;
 
   // Avoid repetitive calculations, use static.
-  // See http://drupal.org/node/1969956.
+  // Note: Using REQUEST_TIME for consistent day calculations across requests.
   // And even better, avoid the expensive DateObject.
   $today = (int) idate('w', $_SERVER['REQUEST_TIME']); // Get daynumber sun=0 - sat=6.
   $now = date('Gi', $_SERVER['REQUEST_TIME']); // 'Gi' format.
@@ -368,8 +368,8 @@ function office_hours_field_formatter_view($entity_type, $entity, $field, $insta
   }
 
   // We have to separate display from JS 'Open' calculation here.
-  // So we copy the days array before it get modified for display:
-  // See https://www.drupal.org/project/office_hours/issues/2919519
+  // So we copy the days array before it gets modified for display.
+  // This ensures JS calculations work with the original day data.
   $days2calc = $days;
 
   // Reorder weekdays to match the first day of the week, using formatter settings;

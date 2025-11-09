@@ -304,8 +304,8 @@ function office_hours_instance_is_empty($items) {
 /**
  * Implements hook_field_load(), hook_field_presave().
  * NB. Do NOT use these hooks. On the field_settings_form, we have a multi-value default value.
- * hook_field_load() and hook_field_presave() are NOT called on this page, destroying the data.
- * This hook is not called in the widget settings page. See http://drupal.org/node/1944678 .
+ * hook_field_load() and hook_field_presave() are NOT called on this page, which would destroy the data.
+ * This is a known limitation in Backdrop's field API when using multi-value defaults on field settings pages.
  */
 // function office_hours_field_load($entity_type, $entities, $field, $instances, $langcode, &$items, $age) {
 // }

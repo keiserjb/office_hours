@@ -132,16 +132,16 @@ function _office_hours_update_7100_daynum() {
     $entities = $entities[$entity_type];
     ksort($entities);
 
-    // We may run in time problems. Allow restart using a variable.
+    // We may run in time problems. Allow restart using a state variable.
     $id = -1;
-    $latest_id = variable_get('office_hours-' . $entity_type . '-' . $bundle . '-' . $field_id, $id);
+    $latest_id = state_get('office_hours-' . $entity_type . '-' . $bundle . '-' . $field_id, $id);
 
     // Convert the 'day' column to from 0-13 to 0-6 day range.
     foreach ($entities as $id => $entity) {
       if ($id > $latest_id) {
 
         // Non-node Entity types (like 'taxonomy_term') need enhancing.
-        // Copied from entity_create_stub_entity() (removed in D8).
+        // Enhance entity with required keys for field operations.
         $info = entity_get_info($entity_type);
         // $entity->{$info['entity keys']['id']} = $entity->id;
         if (!empty($info['entity keys']['revision']) && isset($entity->vid)) {
@@ -166,24 +166,24 @@ function _office_hours_update_7100_daynum() {
         }
         // In order to avoid time-outs, only update objects with changed data.
         if (!$empty) {
-          // Prevent core-error #985642, which should be fixed per D7.22
+          // Set original entity to prevent issues with entity update operations
           $full_entity->original = $full_entity;
 
           // field_attach_presave($entity_type, $full_entity);  // This unnecessarily shifts the days.
           field_attach_update($entity_type, $full_entity);
-          variable_set('office_hours-' . $entity_type . '-' . $bundle . '-' . $field_id, $id);
+          state_set('office_hours-' . $entity_type . '-' . $bundle . '-' . $field_id, $id);
         }
       }
     }
   }
 
-  // If we did not break, remove variables.
+  // If we did not break, remove state variables.
   foreach ($oh_fields as $id => $field) {
     $entity_type = $field['entity_type'];
     $bundle = $field['bundle'];
     $field_id = $field['field_id'];
     $field_name = $field['field_name'];
-    variable_del('office_hours-' . $entity_type . '-' . $bundle . '-' . $field_id);
+    state_delete('office_hours-' . $entity_type . '-' . $bundle . '-' . $field_id);
   }
 }
 

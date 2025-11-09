@@ -45,7 +45,7 @@ function theme_office_hours_field_formatter_default($vars) {
     $label = $daynames[$info['startday']];
     $label .= !isset($info['endday']) ? '' : $settings['separator_grouped_days'] . $daynames[$info['endday']];
     $label .= $settings['separator_day_hours'];
-    $max_label_length = max($max_label_length, drupal_strlen($label));
+    $max_label_length = max($max_label_length, backdrop_strlen($label));
 
     // Format the time.
     if (!$info['times']) {
@@ -123,7 +123,7 @@ function theme_office_hours_field_formatter_default($vars) {
     $html_current_status .= '<div class="oh-current-open element-hidden">' . $settings['current_status']['open_text'] . '</div>';
     $html_current_status .= '<div class="oh-current-closed element-hidden">' . $settings['current_status']['closed_text'] . '</div>';
     $html_current_status .= '</div>';
-    drupal_add_js(array(
+    backdrop_add_js(array(
       'office_hours' => array (
         'instances' => array (
           $context_id => array (
@@ -191,7 +191,7 @@ function theme_office_hours_select($vars) {
 function theme_office_hours_week($variables) {
   $element = $variables['element'];
   $output = '';
-  $table_id = drupal_html_id($element['#field_name'] . '_values');
+  $table_id = backdrop_html_id($element['#field_name'] . '_values');
   $required = !empty($element['#required']) ? theme('form_required_marker', $variables) : '';
 
   $header = array(
@@ -204,7 +204,7 @@ function theme_office_hours_week($variables) {
   $rows = array();
   foreach (element_children($element) as $key) {
     $rows[] = array(
-      drupal_render($element[$key]),
+      render($element[$key]),
     );
   }
 
