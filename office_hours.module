@@ -6,7 +6,6 @@
  */
 
 // @TODO 2012-05-13: it would be nice to include this file in the .info-file, but the OH-block is lost after F5-page refresh.
-// @TODO see http://nodesforbreakfast.com/article/2012/02/20/organize-your-module-code-hookhookinfo-drupal-7
 // @todo for 'multiple blocks per day', see code with string 'multiple blocks per day'.
 module_load_include('inc', 'office_hours', 'includes/office_hours.elements');
 module_load_include('inc', 'office_hours', 'includes/office_hours.field');
