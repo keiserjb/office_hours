@@ -57,18 +57,18 @@ function theme_office_hours_field_formatter_default($vars) {
       $times = array();
       foreach ($info['times'] as $block_times) {
         $times[] = theme(
-                    'office_hours_time_range', 
+                    'office_hours_time_range',
                     array(
-          'times' => $block_times,
-          'format' => $timeformat,
-          'separator' => $settings['separator_hours_hours'],
-          'comment' => $block_times['comment'],
-        )
+                      'times'       => $block_times,
+                      'format'      => $timeformat,
+                      'separator'   => $settings['separator_hours_hours'],
+                      'comment'     => $block_times['comment'],
+                    )
                   );
       }
       $times = implode($settings['separator_more_hours'], $times);
       if ($settings['hoursformat'] == 3) {
-        $times = str_replace(array('am', 'pm'), array('a.m.', 'p.m.'), $times);
+        $times = str_replace(array('am','pm'), array('a.m.','p.m.'), $times);
       }
     }
 
@@ -124,12 +124,12 @@ function theme_office_hours_field_formatter_default($vars) {
     $html_current_status .= '<div class="oh-current-closed element-hidden">' . $settings['current_status']['closed_text'] . '</div>';
     $html_current_status .= '</div>';
     backdrop_add_js(array(
-      'office_hours' => array(
-        'instances' => array(
-          $context_id => array(
+      'office_hours' => array (
+        'instances' => array (
+          $context_id => array (
             'days2calc' => $days2calc,
-          ),
-        ),
+          )
+        )
       ),
     ), 'setting');
 
@@ -192,7 +192,7 @@ function theme_office_hours_week($variables) {
   $element = $variables['element'];
   $output = '';
   $table_id = backdrop_html_id($element['#field_name'] . '_values');
-  $required = !empty($element['#required'])?theme('form_required_marker', $variables) : '';
+  $required = !empty($element['#required']) ? theme('form_required_marker', $variables) : '';
 
   $header = array(
     array(
@@ -204,20 +204,20 @@ function theme_office_hours_week($variables) {
   $rows = array();
   foreach (element_children($element) as $key) {
     $rows[] = array(
-      backdrop_render($element[$key]),
+      render($element[$key]),
     );
   }
 
   $output = '<div class="form-item">';
-  $output .= theme('table', 
+  $output .= theme('table',
                    array(
-    'header' => $header,
-    'rows' => $rows,
-    'attributes' => array(
-      'id' => $table_id,
-      'class' => array('field-multiple-table'),
-    ),
-  )
+                     'header' => $header,
+                     'rows' => $rows,
+                     'attributes' => array(
+                       'id' => $table_id,
+                       'class' => array('field-multiple-table'),
+                     ),
+                   )
                  );
   $output .= $element['#description'] ? '<div class="description">' . $element['#description'] . '</div>' : '';
   $output .= '</div>';
